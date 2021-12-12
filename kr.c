@@ -79,7 +79,7 @@ Text read_input()
 
 
 Text sort_word(Text text){
-
+	//smth new
 }
 
 
