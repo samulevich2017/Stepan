@@ -8,6 +8,7 @@
 typedef struct Sentence{
     char* sent;
     int len_s;
+    int count_word3;
 } Sentence;
 
 typedef struct Text{
@@ -21,6 +22,7 @@ Text read_input()
 {
     int buff_size1, buff_size2 = 20;
     int sent_last_index, text_last_index = -1;
+    int count_word_len, count_w3 = 0;
     char current_char, separator = '\0';
 
     char* s;
@@ -44,6 +46,16 @@ Text read_input()
                 buff_size1 += 20;
                 s = (char*) realloc(s, buff_size1);
             }
+            
+            if(current_char != ' ' && current_char != ',' && current_char != '.'){
+				count_word_len++;
+			}
+			else{
+				if(count_word_len == 3){
+					count_w3++;
+				}
+				count_word_len = 0;
+			}
 
             s[sent_last_index] = current_char;
         }
@@ -55,6 +67,7 @@ Text read_input()
 
         sentence.sent = s;
         sentence.len_s = sent_last_index;
+        sentence.count_word3 = count_w3;
 
         text_last_index++;
         if(text_last_index >= buff_size2){
@@ -76,10 +89,34 @@ Text read_input()
     return text;
 }
 
+int comparator(const void* s1, const void* s2){
+
+	Sentence sent1 = *(Sentence*)s1;
+	Sentence sent2 = *(Sentence*)s2;
+
+	int cw3_1 = sent1.count_word3;
+	int cw3_2 = sent2.count_word3;
+
+	if(cw3_1 > cw3_2){
+		return -1;
+	}
+
+	if(cw3_2 > cw3_1){
+		return 1;
+	}
+
+	return 0;
+
+}
 
 
 Text sort_word(Text text){
-	//smth new
+    
+	Text new_text = text;
+	
+	qsort(new_text.txt, new_text.len_t, sizeof(Sentence), comparator);
+	
+	return new_text;
 }
 
 
@@ -148,15 +185,12 @@ Text reverse_i(Text text, int index)
 
             for (int j = 0; j <= cur_sentence.len_s; j++) {
 
-                //printf("%d %d\n", j, sep_ind[m]);
-
                 if(j != sep_ind[m]){
                     new_sentence[j] = let[j - m];
                 }
 
                 else{
                     new_sentence[j] = cur_sentence.sent[j];
-                    //puts("got");
                     m++;
                 }
 
@@ -291,6 +325,7 @@ int main()
     int num_flag;
     Text result_ph;
     Text result_rv;
+    Text result_sort;
     int user_index;
 
 
@@ -355,7 +390,11 @@ int main()
                 //free result_rv
                 break;
 
-
+		
+	    case(3):
+	        result_sort = sort_word(input);
+		    print_text(result_sort);
+		    break;
 
 
             default:
