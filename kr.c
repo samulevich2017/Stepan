@@ -81,6 +81,11 @@ Text read_input()
         input_text[text_last_index] = sentence;
 
         separator = getchar();
+	
+	if(separator != ' ' && separator != '\n' && separator != '\0'){
+		printf("Warning: Sentences must be separated by ' '. Answer can be incorrect.\n");
+	}
+
     }
 
     input_text = (Sentence*) realloc(input_text, (text_last_index + 1) * sizeof(Sentence));
@@ -94,7 +99,7 @@ Text read_input()
 
 
 Text remove_same_sent(Text text){
-	//puts("Nothing yet : (");
+	
 	int flag_ne = 0;
 	int new_len = text.len_t;
 
@@ -413,6 +418,7 @@ int main()
     Text result_rv;
     Text result_sort;
     int user_index;
+    int test_input;
 
     input = remove_same_sent(input);
 
@@ -427,7 +433,12 @@ int main()
     while(user_input != -1){
         //sleep(1);
         printf("\nChoose option:\n0 - Numbers and their frequency;\n1 - Delete all sentences with word \"physics\";\n2 - Invert chosen sentence;\n3 - Sort sentences;\n-1 - Exit.\nEnter your number: ");
-        scanf("%d", &user_input);
+        test_input = scanf("%d", &user_input);
+	
+	if(test_input == 0){
+		puts("Error: Enter NUMBER! Terminated.");
+		return 0;
+	}
 
         printf("\nResult: ");
 
@@ -475,7 +486,12 @@ int main()
             case(2):
 
                 printf("\nEnter index of sentence you want to invert: ");
-                scanf("%d", &user_index);
+                test_input = scanf("%d", &user_index);
+		if(test_input == 0){
+			printf("Error: Enter NUMBER! Terminated.");
+			return 0;
+		}
+
                 if(user_index < 0 || user_index > input.len_t - 1){
                     printf("Index is wrong!");
                 }
