@@ -9,6 +9,7 @@ typedef struct Sentence{
     char* sent;
     int len_s;
     int count_word3;
+    int rep;
 } Sentence;
 
 typedef struct Text{
@@ -68,6 +69,7 @@ Text read_input()
         sentence.sent = s;
         sentence.len_s = sent_last_index;
         sentence.count_word3 = count_w3;
+	sentence.rep = 0;
 
         text_last_index++;
         if(text_last_index >= buff_size2){
@@ -92,7 +94,52 @@ Text read_input()
 
 
 Text remove_same_sent(Text text){
-	puts("Nothing yet : (");
+	//puts("Nothing yet : (");
+	int flag_ne = 0;
+	int new_len = text.len_t;
+
+	for(int i = 0; i < text.len_t; i++){
+		for(int j = 0; j < text.len_t; j++){
+			if(i != j && text.txt[i].len_s == text.txt[j].len_s && text.txt[j].rep != 1 && text.txt[i].rep != 1){
+				flag_ne = 0;
+				for(int k = 0; k <= text.txt[i].len_s; k++){
+					if(text.txt[i].sent[k] != text.txt[j].sent[k]){
+						flag_ne = 1;
+					}
+
+				}
+				if(flag_ne == 0){
+					text.txt[j].rep = 1;
+					new_len--;
+				}
+				
+			}
+		}
+
+	}
+	
+	int i = 0;
+	int s = 0;
+
+	while(i < text.len_t){
+		if(text.txt[i].rep == 1){
+			s++;
+		}
+
+		else{
+			text.txt[i - s] = text.txt[i];
+		}
+
+		i++;
+	}
+
+	text.len_t = new_len;
+
+	text.txt = (Sentence*) realloc(text.txt, text.len_t * sizeof(Sentence));
+
+	return text;	
+	
+
 }
 
 
@@ -131,7 +178,7 @@ Text sort_word(Text text){
 
 
 	for(int i = 0; i < text.len_t; i++){
-		new_sent = malloc(text.txt[i].len_s + 1)
+		new_sent = malloc(text.txt[i].len_s + 1);
 		strcpy(new_sent, text.txt[i].sent);
 
 		new_sentence.sent = new_sent;
@@ -367,12 +414,19 @@ int main()
     Text result_sort;
     int user_index;
 
-    remove_same_sent(input);
+    input = remove_same_sent(input);
+
+    printf("\nAll same sentences removed. Now text is:\n");
+
+    print_text(input);
+
+    printf("\n");
+
 
 
     while(user_input != -1){
         //sleep(1);
-        printf("\nChoose option:\n0 - Numbers and their frequency;\n1 - Delete all sentences with word \"physics\";\n2 - Invert chosen sentence;\n3 - Sort sentences;\n -1 - Exit.\nEnter your number: ");
+        printf("\nChoose option:\n0 - Numbers and their frequency;\n1 - Delete all sentences with word \"physics\";\n2 - Invert chosen sentence;\n3 - Sort sentences;\n-1 - Exit.\nEnter your number: ");
         scanf("%d", &user_input);
 
         printf("\nResult: ");
