@@ -89,6 +89,14 @@ Text read_input()
     return text;
 }
 
+
+
+Text remove_same_sent(Text text){
+	puts("Nothing yet : (");
+}
+
+
+
 int comparator(const void* s1, const void* s2){
 
 	Sentence sent1 = *(Sentence*)s1;
@@ -110,9 +118,33 @@ int comparator(const void* s1, const void* s2){
 }
 
 
+
 Text sort_word(Text text){
     
-	Text new_text = text;
+	Text new_text;
+
+	char* new_sent;
+
+	Sentence* new_txt = (Sentence*) malloc(text.len_t * sizeof(Sentence));
+
+	Sentence new_sentence;
+
+
+	for(int i = 0; i < text.len_t; i++){
+		new_sent = malloc(text.txt[i].len_s + 1)
+		strcpy(new_sent, text.txt[i].sent);
+
+		new_sentence.sent = new_sent;
+		new_sentence.len_s = text.txt[i].len_s;
+		new_sentence.count_word3 = text.txt[i].count_word3;
+
+		new_txt[i] = new_sentence;
+		
+	}
+
+	new_text.txt = new_txt;
+	new_text.len_t = text.len_t;
+
 	
 	qsort(new_text.txt, new_text.len_t, sizeof(Sentence), comparator);
 	
@@ -152,7 +184,6 @@ Text reverse_i(Text text, int index)
             sep_ind = (int*) malloc((cur_sentence.len_s + 1) * sizeof(int));
 
             k = 0;
-
             m = 0;
 
             for (int j = 0; j <= cur_sentence.len_s; j++) {
@@ -220,23 +251,31 @@ Text remove_physics(Text text)
     char physics[] = "physics";
     char* sbstr_a;
     char* cur_sentence;
+    char* c_sent_low;
+
     Sentence* new_txt = (Sentence*) malloc(text.len_t * sizeof(Sentence));
     Text new_text;
-
 
 
     for (int i = 0; i < text.len_t; i++) {
 
         cur_sentence = text.txt[i].sent;
 
+	c_sent_low = malloc(text.txt[i].len_s + 1);
+
+	for(int k = 0; k <= text.txt[i].len_s; k++){
+		c_sent_low[k] = tolower(cur_sentence[k]);
+	}
+
+
         flag_ph = 0;
-        sbstr_a = strstr(cur_sentence, physics);
+        sbstr_a = strstr(c_sent_low, physics);
 
         if(sbstr_a != NULL){
 
             r_chr = *(sbstr_a + 7);
 
-            if(sbstr_a == cur_sentence){
+            if(sbstr_a == c_sent_low){
 
                 if(r_chr == ' ' || r_chr ==  ',' || r_chr ==  '.'){
                     flag_ph = 1;
@@ -328,11 +367,14 @@ int main()
     Text result_sort;
     int user_index;
 
+    remove_same_sent(input);
+
 
     while(user_input != -1){
         //sleep(1);
-        printf("\nChoose option:\n0 - Numbers and their frequency;\n1 - Delete all sentences with word \"physics\";\n2 - Invert chosen sentence;\n-1 - Exit.\nEnter your number: ");
+        printf("\nChoose option:\n0 - Numbers and their frequency;\n1 - Delete all sentences with word \"physics\";\n2 - Invert chosen sentence;\n3 - Sort sentences;\n -1 - Exit.\nEnter your number: ");
         scanf("%d", &user_input);
+
         printf("\nResult: ");
 
         switch(user_input){
