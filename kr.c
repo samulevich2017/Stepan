@@ -35,6 +35,8 @@ Text read_input()
 
         current_char = '\0';
         sent_last_index = -1;
+	count_w3 = 0;
+	count_word_len = 0;
         buff_size1 = 20;
         Sentence sentence;
 
@@ -83,7 +85,7 @@ Text read_input()
         separator = getchar();
 	
 	if(separator != ' ' && separator != '\n' && separator != '\0'){
-		printf("Warning: Sentences must be separated by ' '. Answer can be incorrect.\n");
+		printf("\nWarning: Sentences must be separated by ' '. Answer can be incorrect.\n");
 	}
 
     }
@@ -98,7 +100,7 @@ Text read_input()
 
 
 
-Text remove_same_sent(Text text){
+Text remove_same_sent(Text text, int old_len){
 	
 	int flag_ne = 0;
 	int new_len = text.len_t;
@@ -126,21 +128,24 @@ Text remove_same_sent(Text text){
 	int i = 0;
 	int s = 0;
 
-	while(i < text.len_t){
-		if(text.txt[i].rep == 1){
-			s++;
+	if(new_len < old_len){
+
+		while(i < text.len_t){
+			if(text.txt[i].rep == 1){
+				s++;
+			}
+
+			else{
+				text.txt[i - s] = text.txt[i];
+			}
+
+			i++;
 		}
 
-		else{
-			text.txt[i - s] = text.txt[i];
-		}
+		text.len_t = new_len;
 
-		i++;
+		text.txt = (Sentence*) realloc(text.txt, text.len_t * sizeof(Sentence));
 	}
-
-	text.len_t = new_len;
-
-	text.txt = (Sentence*) realloc(text.txt, text.len_t * sizeof(Sentence));
 
 	return text;	
 	
@@ -287,6 +292,9 @@ Text reverse_i(Text text, int index)
 
     new_text.txt = new_txt;
 
+    free(let);
+    free(sep_ind);
+
     return new_text;
 
 }
@@ -313,7 +321,7 @@ Text remove_physics(Text text)
 
         cur_sentence = text.txt[i].sent;
 
-	c_sent_low = malloc(text.txt[i].len_s + 1);
+	c_sent_low = (char*) malloc(text.txt[i].len_s + 1);
 
 	for(int k = 0; k <= text.txt[i].len_s; k++){
 		c_sent_low[k] = tolower(cur_sentence[k]);
@@ -358,6 +366,7 @@ Text remove_physics(Text text)
     new_text.txt = new_txt;
     new_text.len_t = j;
 
+    free(c_sent_low);
 
     return new_text;
 
@@ -416,19 +425,23 @@ int main()
     int num_flag;
     Text result_ph;
     Text result_rv;
+    Text result_same;
     Text result_sort;
     int user_index;
     int test_input;
+    int old_t_len;
+    
+    old_t_len = input.len_t;
 
-    input = remove_same_sent(input);
+    input = remove_same_sent(input, old_t_len);
+    
+    if(input.len_t < old_t_len){
 
-    printf("\nAll same sentences removed. Now text is:\n");
+    	printf("\nAll same sentences removed. Now text is:\n");
+    	print_text(input);
 
-    print_text(input);
-
-    printf("\n");
-
-
+    	printf("\n");
+    }
 
     while(user_input != -1){
         //sleep(1);
@@ -436,7 +449,7 @@ int main()
         test_input = scanf("%d", &user_input);
 	
 	if(test_input == 0){
-		puts("Error: Enter NUMBER! Terminated.");
+		puts("\nError: Enter NUMBER! Terminated.");
 		return 0;
 	}
 
@@ -457,7 +470,7 @@ int main()
 
 
                 if(num_flag == 0){
-                    printf("There arent any numbers in text.");
+                    printf("There aren't any numbers in text.");
                 }
 
                 else{
@@ -478,35 +491,54 @@ int main()
 
                 result_ph = remove_physics(input);
                 print_text(result_ph);
-                //free result_ph
+
+                for(int i = 0; i < result_ph.len_t; i++){
+			free(result_ph.txt[i].sent);
+		}
+
+		free(result_ph.txt);
+
                 break;
 
 
 
             case(2):
 
-                printf("\nEnter index of sentence you want to invert: ");
+                printf("\nEnter index of sentence you want to invert (use numbers form 0 to %d): ", input.len_t - 1);
                 test_input = scanf("%d", &user_index);
+
 		if(test_input == 0){
-			printf("Error: Enter NUMBER! Terminated.");
+			printf("\nError: Enter NUMBER! Terminated.");
 			return 0;
 		}
 
                 if(user_index < 0 || user_index > input.len_t - 1){
-                    printf("Index is wrong!");
+                    printf("\nIndex is wrong! Index can be only from 0 to %d.", input.len_t - 1);
                 }
                 else{
                     result_rv = reverse_i(input, user_index);
                     print_text(result_rv);
                 }
-                //free result_rv
+                
+		for(int i = 0; i < result_rv.len_t; i++){
+			free(result_rv.txt[i].sent);
+		}
+
+		free(result_rv.txt);
+
                 break;
 
 		
 	    case(3):
 	        result_sort = sort_word(input);
-		    print_text(result_sort);
-		    break;
+		print_text(result_sort);
+		for(int i = 0; i < result_sort.len_t; i++){
+			free(result_sort.txt[i].sent);
+		}
+
+		free(result_sort.txt);
+
+		break;
 
 
             default:
@@ -515,7 +547,11 @@ int main()
 
             case(-1):
                 printf("Goodbye.");
-                //free input
+                for(int i = 0; i < input.len_t; i++){
+			free(input.txt[i].sent);
+		}
+
+		free(input.txt);
 
         }
 
