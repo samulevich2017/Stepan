@@ -21,6 +21,9 @@ typedef struct Text{
 
 Text read_input()
 {
+
+
+
     int buff_size1, buff_size2 = 20;
     int sent_last_index, text_last_index = -1;
     int count_word_len, count_w3 = 0;
@@ -110,7 +113,7 @@ Text remove_same_sent(Text text, int old_len){
 			if(i != j && text.txt[i].len_s == text.txt[j].len_s && text.txt[j].rep != 1 && text.txt[i].rep != 1){
 				flag_ne = 0;
 				for(int k = 0; k <= text.txt[i].len_s; k++){
-					if(text.txt[i].sent[k] != text.txt[j].sent[k]){
+					if(tolower(text.txt[i].sent[k]) != tolower(text.txt[j].sent[k])){
 						flag_ne = 1;
 					}
 
@@ -415,7 +418,7 @@ void print_text(Text text)
 
 int main()
 {
-    printf("Enter text:\n");
+    puts("Enter text:");
 
     Text input = read_input();
 
@@ -437,7 +440,7 @@ int main()
     
     if(input.len_t < old_t_len){
 
-    	printf("\nAll same sentences removed. Now text is:\n");
+    	puts("\nAll the same sentences removed. Now your text is:");
     	print_text(input);
 
     	printf("\n");
@@ -508,7 +511,7 @@ int main()
                 test_input = scanf("%d", &user_index);
 
 		if(test_input == 0){
-			printf("\nError: Enter NUMBER! Terminated.");
+			puts("\nError: Enter NUMBER! Terminated.");
 			return 0;
 		}
 
